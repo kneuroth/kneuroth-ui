@@ -1,0 +1,54 @@
+@charset "UTF-8";
+
+/* ─────────────────────────────────────────────────────────────────────────
+   .reveal — entrance for content that flies in from the side of the screen
+   the first time it scrolls into view. Entrance only: it reveals once, then
+   stays put.
+
+   .reveal is the TRACK and never moves; its child is what travels. That split
+   matters: IntersectionObserver measures the transformed box, so a card parked
+   a viewport off to the side would never report as visible.
+
+   Travel is 100vw, so an ancestor must clip horizontally
+   (`overflow-x: clip`) or the start position widens the page.
+   ───────────────────────────────────────────────────────────────────────── */
+
+@layer components {
+  .reveal > * {
+    opacity: 0;
+    transform: translate3d(-100vw, 0, 0);
+    /* Opacity lands well before the travel does, so it's visible for most of
+     its flight rather than materialising on arrival. */
+    transition:
+      opacity 0.4s ease-out,
+      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+
+  .reveal[data-from='right'] > * {
+    transform: translate3d(100vw, 0, 0);
+  }
+
+  .reveal[data-revealed] > * {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal > *,
+    .reveal[data-from='right'] > * {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
+  /* Paper gets the content, not the entrance. */
+  @media print {
+    .reveal > *,
+    .reveal[data-from='right'] > * {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+}

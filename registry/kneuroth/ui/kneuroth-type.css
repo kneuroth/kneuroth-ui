@@ -1,0 +1,39 @@
+@charset "UTF-8";
+
+/* ─────────────────────────────────────────────────────────────────────────
+   kneuroth-ui — the site's voice. Import ONCE, from your app's entry or root
+   layout; the components don't import it, because it styles the whole page.
+
+   One typewriter stack, everywhere, all lower case: with one face and no
+   capitals, pages read as something typed rather than something published.
+
+   Lower case is a transform, not an edit to the strings: sentence case stays
+   in the DOM, so a screen reader still says "Wordle League", the words stay
+   searchable, and turning it off is one line. Add `.keep-case` to anything that
+   must hold its capitals — code, or a name that stops being itself in lower
+   case. Browser-tab titles can't be reached from CSS; lower-case those in
+   source.
+
+   Mono is wide and slow to read, so keep prose short.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --kn-font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+}
+
+@layer theme, base, components, utilities;
+
+/* In `base`, so a font or case utility on <body> still wins. */
+@layer base {
+  body {
+    font-family: var(--kn-font-mono);
+    text-transform: lowercase;
+  }
+}
+
+/* Unlayered on purpose: the escape hatch should never lose. */
+.keep-case {
+  text-transform: none;
+}

@@ -1,0 +1,115 @@
+@import 'tailwindcss';
+
+/* The docs page only — none of this ships in the registry. */
+
+@theme {
+  --color-frenchgrey: #bbb9be;
+  --color-ink: #e9e4df;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+  color-scheme: dark;
+}
+
+/* Glass needs something to blur. The page stands on a dark warm room lit by
+   two soft pools of light, fixed so the panels slide over it. */
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--color-ink);
+  background-color: #120d0e;
+  background-image:
+    radial-gradient(60vw 50vh at 85% 10%, rgb(255 140 60 / 0.16), transparent),
+    radial-gradient(50vw 60vh at 5% 70%, rgb(70 120 200 / 0.18), transparent),
+    radial-gradient(40vw 40vh at 50% 110%, rgb(0 155 72 / 0.08), transparent);
+  background-attachment: fixed;
+  overflow-x: clip;
+}
+
+/* A preview stage: a busier ground than the page, so the frost, the clear
+   strip and the blur all read. `data-ground="photo"` stands in for a raw
+   photograph; `page` for a page with the veil dropped behind it. */
+.stage {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  min-height: 11rem;
+  padding: 2.5rem 1.5rem;
+  border-radius: 1rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 22% 30%, rgb(255 120 40 / 0.55), transparent 28%),
+    radial-gradient(circle at 78% 70%, rgb(40 110 220 / 0.55), transparent 30%),
+    radial-gradient(
+      circle at 60% 20%,
+      rgb(255 255 255 / 0.18),
+      transparent 22%
+    ),
+    repeating-linear-gradient(
+      115deg,
+      rgb(255 255 255 / 0.05) 0 2px,
+      transparent 2px 22px
+    ),
+    #1a1213;
+}
+
+.stage[data-ground='page'] {
+  background:
+    radial-gradient(
+      circle at 25% 35%,
+      rgb(255 200 150 / 0.35),
+      transparent 30%
+    ),
+    radial-gradient(circle at 75% 65%, rgb(120 170 230 / 0.4), transparent 32%),
+    repeating-linear-gradient(
+      115deg,
+      rgb(255 255 255 / 0.06) 0 2px,
+      transparent 2px 22px
+    ),
+    #3a3436;
+}
+
+.stage[data-ground='dark'] {
+  background:
+    radial-gradient(circle at 30% 40%, rgb(255 120 40 / 0.18), transparent 30%),
+    #070505;
+}
+
+.code {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: #d8d2cc;
+  background: rgb(0 0 0 / 0.35);
+  border: 1px solid rgb(187 185 190 / 0.12);
+  border-radius: 0.75rem;
+  tab-size: 2;
+}
+
+.prop-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+.prop-table th,
+.prop-table td {
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid rgb(187 185 190 / 0.12);
+}
+.prop-table th {
+  color: var(--color-frenchgrey);
+  font-weight: 600;
+}
+.prop-table code {
+  color: var(--sweep-base);
+}

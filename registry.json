@@ -1,0 +1,138 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "kneuroth",
+  "homepage": "https://kneuroth.github.io/kneuroth-ui/",
+  "items": [
+    {
+      "name": "base",
+      "type": "registry:ui",
+      "title": "Base",
+      "description": "Tokens, the animated glow/breathe custom properties, the shared keyframes, and small helpers (cx, mergeRefs, useGlowDelay). Every other item depends on it.",
+      "files": [
+        { "path": "registry/kneuroth/ui/kneuroth.css", "type": "registry:ui" },
+        { "path": "registry/kneuroth/ui/kn-utils.ts", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "typography",
+      "type": "registry:ui",
+      "title": "Typography",
+      "description": "The site's voice: one monospace stack, everything lower case, with a .keep-case escape hatch. Import kneuroth-type.css once from the app entry or root layout.",
+      "files": [
+        {
+          "path": "registry/kneuroth/ui/kneuroth-type.css",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "glow-sweep",
+      "type": "registry:ui",
+      "title": "Sweep link",
+      "description": "The canonical text link: letters breathing white to blue, one cube-colour sweep across them on hover. SweepLink, the useGlowSweep hook, and the .glow-sweep class.",
+      "registryDependencies": ["@kneuroth/base"],
+      "files": [
+        { "path": "registry/kneuroth/ui/glow-sweep.css", "type": "registry:ui" },
+        {
+          "path": "registry/kneuroth/ui/use-glow-sweep.ts",
+          "type": "registry:ui"
+        },
+        { "path": "registry/kneuroth/ui/sweep-link.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "glow-button",
+      "type": "registry:ui",
+      "title": "Glow button",
+      "description": "A control that reads as a word: embossed letters with a revolving cube-colour ring behind them. Variants warm, dark, azure (by surface) and icon (for every icon-only control); sweep for text link-buttons.",
+      "registryDependencies": ["@kneuroth/base", "@kneuroth/glow-sweep"],
+      "files": [
+        { "path": "registry/kneuroth/ui/glow-link.css", "type": "registry:ui" },
+        { "path": "registry/kneuroth/ui/glow-button.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "glass",
+      "type": "registry:ui",
+      "title": "Glass material",
+      "description": "The frosted-glass material as classes: .glass-edge (the breathing white-to-blue stroke and bloom) and .glass-dark (the near-black inward fill), plus GlassPanel's styles.",
+      "registryDependencies": ["@kneuroth/base"],
+      "files": [
+        { "path": "registry/kneuroth/ui/glass.css", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "glass-panel",
+      "type": "registry:ui",
+      "title": "Glass panel",
+      "description": "Every frosted surface: a floating rounded panel with a layered edge (stroke, clear strip, frost), a header bar, or a dark footer bar. edge joins a floating panel to a screen edge.",
+      "registryDependencies": ["@kneuroth/base", "@kneuroth/glass"],
+      "files": [
+        { "path": "registry/kneuroth/ui/glass-panel.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "glass-button",
+      "type": "registry:ui",
+      "title": "Glass button",
+      "description": "A control that reads as an object: a pressable slab of the panel's glass with the cube-colour triad revolving on its rim. Tones light and dark, picked from the ground.",
+      "registryDependencies": ["@kneuroth/base"],
+      "files": [
+        {
+          "path": "registry/kneuroth/ui/glass-button.css",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/kneuroth/ui/glass-button.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "search-field",
+      "type": "registry:ui",
+      "title": "Search field",
+      "description": "A search box on the panel's glass: the quietest edge, a pale-blue magnifier, and a held blue stroke while focused. Controlled or uncontrolled; Escape clears.",
+      "registryDependencies": ["@kneuroth/base", "@kneuroth/glass"],
+      "files": [
+        {
+          "path": "registry/kneuroth/ui/search-field.css",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/kneuroth/ui/search-field.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "reveal",
+      "type": "registry:ui",
+      "title": "Reveal",
+      "description": "Flies content in from the side of the screen the first time it scrolls into view, once. Reveal (a wrapper that is observed and never moves) and the useReveal hook.",
+      "registryDependencies": ["@kneuroth/base"],
+      "files": [
+        { "path": "registry/kneuroth/ui/reveal.css", "type": "registry:ui" },
+        { "path": "registry/kneuroth/ui/reveal.tsx", "type": "registry:ui" }
+      ]
+    },
+    {
+      "name": "all",
+      "type": "registry:ui",
+      "title": "Everything",
+      "description": "Every kneuroth-ui item in one install.",
+      "registryDependencies": [
+        "@kneuroth/base",
+        "@kneuroth/typography",
+        "@kneuroth/glow-sweep",
+        "@kneuroth/glow-button",
+        "@kneuroth/glass",
+        "@kneuroth/glass-panel",
+        "@kneuroth/glass-button",
+        "@kneuroth/search-field",
+        "@kneuroth/reveal"
+      ],
+      "files": []
+    }
+  ]
+}

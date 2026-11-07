@@ -1,0 +1,177 @@
+@import './kneuroth.css';
+
+/* ─────────────────────────────────────────────────────────────────────────
+   .glass-button — a pressable slab of the panel's frosted material: rim, clear
+   strip, frosted interior. Where GlowButton is a word with light behind it,
+   this is an object you press, and its rim is the difference: the cube triad
+   moves from behind the control into its border, on the same glowSpin /
+   glowCube cycle.
+
+   The knobs are declared under :where() so a caller's class always wins over
+   them, whatever order the stylesheets load in:
+     --glass-radius  (override this, not border-radius, or the fill stops
+                      following the corners)
+     --glass-rim     rim thickness
+     --glass-strip   the clear strip inside the rim
+   ───────────────────────────────────────────────────────────────────────── */
+
+@layer components {
+  :where(.glass-button) {
+    --glass-rim: 2px;
+    --glass-strip: 5px;
+    --glass-radius: 1rem;
+    /* Light tone: the panel's white frost, for a button on a page. */
+    --glass-fill: rgb(255 255 255 / 0.2);
+    --glass-blur: blur(9px) saturate(1.15);
+  }
+
+  /* Dark tone: for a button on the raw photograph, where white frost at 0.2
+   vanishes into a bright windowsill. Same numbers as .glass-dark. */
+  :where(.glass-button[data-tone='dark']) {
+    --glass-fill: rgb(8 4 5 / 0.72);
+    --glass-blur: blur(6px) saturate(1.1);
+  }
+
+  .glass-button {
+    position: relative;
+    /* Keeps the two decoration layers' negative z-index behind this button's
+     label and no further. */
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    box-sizing: border-box;
+    padding: 0.7em 1.4em;
+    text-decoration: none;
+    border: 0;
+    border-radius: var(--glass-radius);
+    background: none;
+    color: var(--sweep-base);
+    font: inherit;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    /* Sturdy, not floaty — the colour lives on the rim, so no blue bloom. */
+    box-shadow: 0 10px 40px rgb(0 0 0 / 0.18);
+    transition:
+      transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.28s ease,
+      color 0.28s ease;
+    animation:
+      glowSpin 10s linear infinite,
+      glowCube 16s linear infinite;
+    animation-delay: var(--glow-delay, 0s), var(--glow-delay, 0s);
+  }
+
+  /* The rim: a conic ring of white + the two cube colours. Masked rather than
+   painted as a border, because the interior has to stay translucent — two
+   masks composited to exclude one another cut the middle out of the gradient,
+   leaving only a ring. */
+  .glass-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: var(--glass-rim);
+    border-radius: inherit;
+    pointer-events: none;
+    background: conic-gradient(
+      from var(--glow-angle),
+      #ffffff,
+      var(--glow-a),
+      var(--glow-b),
+      #ffffff
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+
+  /* The frosted interior, inset by the strip — drawn inward, because a button
+   has to stay inside the box the layout gave it. */
+  .glass-button::after {
+    content: '';
+    position: absolute;
+    inset: var(--glass-strip);
+    z-index: -1;
+    border-radius: calc(var(--glass-radius) - var(--glass-strip));
+    pointer-events: none;
+    background: var(--glass-fill);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+  }
+
+  /* Pressed toward you, and the rim's colour blooms out from under it. A smaller
+   lift than a text link's 1.05: this thing has mass. */
+  .glass-button:hover:not(:disabled, [aria-disabled='true']),
+  .glass-button:focus-visible:not(:disabled, [aria-disabled='true']) {
+    transform: scale(1.03);
+    color: #ffffff;
+    box-shadow:
+      0 12px 44px rgb(0 0 0 / 0.22),
+      0 0 18px color-mix(in srgb, transparent, var(--glow-a) 55%);
+  }
+
+  .glass-button:focus-visible {
+    outline: 2px solid var(--sweep-base);
+    outline-offset: 3px;
+  }
+
+  .glass-button:active:not(:disabled, [aria-disabled='true']) {
+    transform: scale(0.98);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.2);
+  }
+
+  /* Unavailable, not invisible: the glass stays, the light goes out. */
+  .glass-button:disabled,
+  .glass-button[aria-disabled='true'] {
+    cursor: default;
+    opacity: 0.5;
+    animation: none;
+  }
+
+  .glass-button:disabled::before,
+  .glass-button[aria-disabled='true']::before {
+    background: rgb(255 255 255 / 0.25);
+  }
+
+  .glass-button > svg {
+    width: 1.15em;
+    height: 1.15em;
+    flex: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glass-button {
+      animation: none;
+      transition: color 0.28s ease;
+    }
+    .glass-button:hover,
+    .glass-button:focus-visible,
+    .glass-button:active {
+      transform: none;
+    }
+  }
+
+  @media print {
+    .glass-button {
+      box-shadow: none !important;
+      color: #1f2937 !important;
+      animation: none !important;
+    }
+    .glass-button::before {
+      background: #d1d5db !important;
+    }
+    .glass-button::after {
+      background: none !important;
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+  }
+}

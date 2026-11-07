@@ -1,0 +1,113 @@
+@import './glass.css';
+
+/* ─────────────────────────────────────────────────────────────────────────
+   .search-field — a pane of the panel's glass you type on. It isn't pressed or
+   said, it's written on, so it takes the quietest edge there is: the panel's
+   breathing white→blue stroke and clear strip, no cube colours at all. Focus
+   is the one change: the stroke stops breathing and holds blue.
+
+   Knobs (under :where(), so your class wins): --search-strip, --search-radius.
+   ───────────────────────────────────────────────────────────────────────── */
+
+@layer components {
+  :where(.search-field) {
+    --search-strip: 6px;
+    --search-radius: 0.9rem;
+  }
+
+  .search-field {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    position: relative;
+    padding: 0.7em 1em;
+    border-radius: var(--search-radius);
+    background: rgb(255 255 255 / 0.2);
+    -webkit-backdrop-filter: blur(9px) saturate(1.15);
+    backdrop-filter: blur(9px) saturate(1.15);
+    cursor: text;
+  }
+
+  .search-field-edge {
+    position: absolute;
+    inset: calc(var(--search-strip) * -1);
+    z-index: -1;
+    pointer-events: none;
+    border-radius: calc(var(--search-radius) + var(--search-strip) - 1px);
+  }
+
+  /* In use: a held state, not a new effect. */
+  .search-field:focus-within > .search-field-edge {
+    animation: none;
+    border-color: rgb(165 197 222 / 0.85);
+    box-shadow:
+      0 10px 40px rgb(0 0 0 / 0.18),
+      0 0 16px rgb(120 165 215 / 0.7);
+  }
+
+  .search-field-icon {
+    flex: none;
+    width: 1.1em;
+    height: 1.1em;
+    color: var(--sweep-base);
+    /* The static icon halo; no hover lift — the icon isn't a control. */
+    filter: drop-shadow(0 0 8px rgb(130 175 225 / 0.45));
+  }
+
+  .search-field-input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    outline: 0;
+    background: none;
+    padding: 0;
+    font: inherit;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+    caret-color: var(--sweep-base);
+    /* What someone types stays what they typed, even on a lower-cased page. */
+    text-transform: none;
+  }
+
+  .search-field-input::placeholder {
+    color: var(--sweep-base);
+    opacity: 0.6;
+    text-transform: lowercase;
+  }
+
+  /* The native clear "x" would be the one un-designed thing here. Escape clears. */
+  .search-field-input::-webkit-search-decoration,
+  .search-field-input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  /* Focus never depends on a glow alone. */
+  .search-field:has(.search-field-input:focus-visible) {
+    outline: 2px solid var(--sweep-base);
+    outline-offset: calc(var(--search-strip) + 3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .search-field-edge {
+      animation: none;
+    }
+  }
+
+  @media print {
+    .search-field {
+      background: #fff !important;
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+      border: 1px solid #d1d5db;
+    }
+    .search-field-edge {
+      display: none !important;
+    }
+    .search-field-icon,
+    .search-field-input {
+      color: #1f2937 !important;
+      filter: none !important;
+    }
+  }
+}

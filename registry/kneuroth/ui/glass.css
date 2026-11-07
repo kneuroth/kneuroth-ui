@@ -1,0 +1,140 @@
+@import './kneuroth.css';
+
+/* ─────────────────────────────────────────────────────────────────────────
+   The frosted glass — the signature material. Reading from the edge inward:
+   a blue bloom, a 2px stroke breathing white→blue, a CLEAR untinted strip
+   where the fill drops away and the background shows straight through, then
+   the frosted interior. The strip is the point; the tint must never span it.
+
+   Glass needs something behind it to blur. Over a flat colour it is just a
+   faint rectangle — put it over a photograph or an image-rich page.
+   ───────────────────────────────────────────────────────────────────────── */
+
+@layer components {
+  /* .glass-edge — the edge only (no fill). GlassPanel and SearchField wear it;
+   so can anything that has to be the material without being the component. */
+  .glass-edge {
+    border: 2px solid
+      color-mix(
+        in srgb,
+        rgb(255 255 255 / 0.6),
+        rgb(165 197 222 / 0.6) calc(100% - var(--breathe, 80%))
+      );
+    box-shadow:
+      0 10px 40px rgb(0 0 0 / 0.18),
+      0 0 12px
+        color-mix(
+          in srgb,
+          transparent,
+          rgb(120 165 215 / 0.7) calc(100% - var(--breathe, 80%))
+        );
+    animation: breathe 4s ease-in-out infinite;
+  }
+
+  /* .glass-dark — the near-black fill, drawn INWARD (inset by --glass-strip), for
+   a card standing on a raw photograph with nothing dimming it, or in a box
+   that clips. Wear it WITH .glass-edge. Keep the padding comfortably larger
+   than --glass-strip or content lands on the strip. The fill is on ::after,
+   leaving ::before free for the card. */
+  .glass-dark {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .glass-dark::after {
+    content: '';
+    position: absolute;
+    inset: var(--glass-strip, 0.35em);
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: rgb(8 4 5 / 0.72);
+    -webkit-backdrop-filter: blur(6px) saturate(1.1);
+    backdrop-filter: blur(6px) saturate(1.1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glass-edge {
+      animation: none;
+    }
+  }
+
+  /* ── GlassPanel ──────────────────────────────────────────────────────────
+   The fill and the blur live on the panel itself; the edge is a separate
+   layer standing 9px PROUD of it with no fill, so the gap is the strip. The
+   panel's backdrop-filter makes it a stacking context, which keeps the edge
+   layer's negative z-index behind this panel's content and no further. */
+  .glass-panel {
+    display: block;
+    position: relative;
+    -webkit-backdrop-filter: blur(9px) saturate(1.15);
+    backdrop-filter: blur(9px) saturate(1.15);
+    background: rgb(255 255 255 / 0.2);
+    border-radius: 1.5rem;
+  }
+
+  .glass-panel-edge {
+    position: absolute;
+    inset: -9px;
+    z-index: -1;
+    pointer-events: none;
+    border-radius: calc(1.5rem + 8px);
+  }
+
+  /* Joined to a screen edge: outer corners square off and that side's stroke
+   drops, so nothing draws a boundary where the panel runs off the screen. The
+   caller puts it against the edge; the panel only stops pretending to end. */
+  .glass-panel[data-edge='left'] {
+    border-radius: 0 1.5rem 1.5rem 0;
+  }
+  .glass-panel[data-edge='left'] > .glass-panel-edge {
+    inset: -9px -9px -9px 0;
+    border-radius: 0 calc(1.5rem + 8px) calc(1.5rem + 8px) 0;
+    border-left-width: 0;
+  }
+
+  .glass-panel[data-edge='right'] {
+    border-radius: 1.5rem 0 0 1.5rem;
+  }
+  .glass-panel[data-edge='right'] > .glass-panel-edge {
+    inset: -9px 0 -9px -9px;
+    border-radius: calc(1.5rem + 8px) 0 0 calc(1.5rem + 8px);
+    border-right-width: 0;
+  }
+
+  /* Header: the floating frost, top corners squared and flush to the top, so it
+   reads as pulled down from the screen edge. Inset it horizontally yourself. */
+  .glass-panel[data-variant='header'] {
+    -webkit-backdrop-filter: blur(10px) saturate(1.1);
+    backdrop-filter: blur(10px) saturate(1.1);
+    border-radius: 0 0 1rem 1rem;
+  }
+  .glass-panel[data-variant='header'] > .glass-panel-edge {
+    inset: -8px;
+    border-radius: 0 0 calc(1rem + 8px) calc(1rem + 8px);
+  }
+
+  /* Footer: near-black frost, full-bleed, a hairline on the content edge — a
+   consistent dark backing over dark photos and pale pages alike. */
+  .glass-panel[data-variant='footer'] {
+    background: rgb(12 6 7 / 0.45);
+    -webkit-backdrop-filter: blur(10px) saturate(1.1);
+    backdrop-filter: blur(10px) saturate(1.1);
+    border-radius: 0;
+    border-top: 1px solid rgb(187 185 190 / 0.1);
+  }
+
+  @media print {
+    .glass-panel {
+      margin: 0 !important;
+      padding: 0 !important;
+      background: #fff !important;
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+      border-radius: 0 !important;
+    }
+    .glass-panel-edge {
+      display: none !important;
+    }
+  }
+}

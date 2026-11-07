@@ -1,0 +1,147 @@
+@import './kneuroth.css';
+
+/* ─────────────────────────────────────────────────────────────────────────
+   .glow-sweep — the canonical text link. The letters rest as a gentle
+   breathing white→blue gradient with a soft blue halo; on hover/focus
+   useGlowSweep picks one of the four cube groupings and fires a single band of
+   colour across the glyphs. Hover is the only trigger — nothing sweeps on its
+   own.
+
+   It clips a background to the text, which swallows an icon: keep icons as
+   SIBLINGS of the swept element, never inside it (GlowButton does this).
+   ───────────────────────────────────────────────────────────────────────── */
+
+@layer components {
+  .glow-sweep {
+    letter-spacing: 0.02em;
+    /* Two layers, both clipped to the letters:
+     - TOP: the moving cube band. Transparent at rest; the hook sets
+       --sweep-c1/--sweep-c2 for one pass, so it only shows while sweeping.
+     - BOTTOM: the resting look — a top→bottom white→base gradient whose stop
+       the breathe drives, so the whole word shifts as one. */
+    background-image:
+      linear-gradient(
+        100deg,
+        transparent 0%,
+        transparent 25%,
+        var(--sweep-c1, transparent) 29%,
+        var(--sweep-c2, transparent) 33%,
+        transparent 37%,
+        transparent 100%
+      ),
+      linear-gradient(180deg, #ffffff, var(--sweep-base) var(--breathe, 80%));
+    background-size:
+      300% 100%,
+      100% 100%;
+    background-position:
+      0% center,
+      0% center;
+    background-repeat: no-repeat, no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    /* Ambient halo, independent of the breathe and of the sweep. */
+    filter: drop-shadow(0 0 8px rgb(130 175 225 / 0.45));
+    transition: filter 0.25s ease;
+    /* Quicker than .glass-edge's 4s: a link is small and read up close. */
+    animation: breathe 2.5s ease-in-out infinite;
+  }
+
+  /* A plain link carries no decoration of its own. */
+  a.glow-sweep {
+    text-decoration: none;
+  }
+
+  /* Hover / focus lifts the halo. Applies to the swept element itself or, inside
+   a GlowButton, to the label when the button is hovered. */
+  .glow-sweep:hover,
+  .glow-sweep:focus-visible,
+  .glow-button:hover > .glow-sweep,
+  .glow-button:focus-visible > .glow-sweep {
+    filter: drop-shadow(0 0 13px rgb(150 190 235 / 0.8));
+  }
+
+  .glow-sweep.is-sweeping {
+    animation:
+      breathe 4s ease-in-out infinite,
+      sweepOnce 0.9s linear;
+  }
+
+  @keyframes sweepOnce {
+    from {
+      background-position:
+        0% center,
+        0% center;
+    }
+    to {
+      /* Only the band layer moves; the resting gradient stays put. */
+      background-position:
+        55% center,
+        0% center;
+    }
+  }
+
+  /* The text is transparent, so focus gets a real outline. */
+  .glow-sweep:focus-visible {
+    outline: 2px solid var(--sweep-base);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  /* ── .glow-sweep-pending ─────────────────────────────────────────────────
+   Somewhere that isn't ready yet. Still a real link, still swept on hover, but
+   everything that says "alive" is turned down: white→grey at rest, a grey
+   halo, a grey band, running the other way. Same shape so it belongs to the
+   set; wrong colour and direction so it reads as not quite on. Drop the class
+   (the `pending` prop) when the place is ready. */
+  .glow-sweep-pending {
+    --sweep-base: rgb(208 208 214 / 1);
+    filter: drop-shadow(0 0 8px rgb(170 170 178 / 0.35));
+  }
+
+  .glow-sweep-pending:hover,
+  .glow-sweep-pending:focus-visible,
+  .glow-button:hover > .glow-sweep-pending,
+  .glow-button:focus-visible > .glow-sweep-pending {
+    filter: drop-shadow(0 0 12px rgb(190 190 198 / 0.6));
+  }
+
+  .glow-sweep-pending.is-sweeping {
+    animation:
+      breathe 4s ease-in-out infinite,
+      sweepOnceBack 0.9s linear;
+  }
+
+  /* sweepOnce, mirrored: enters at the left edge and leaves off the right. */
+  @keyframes sweepOnceBack {
+    from {
+      background-position:
+        43% center,
+        0% center;
+    }
+    to {
+      background-position:
+        -12% center,
+        0% center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glow-sweep {
+      animation: none;
+    }
+  }
+
+  /* background-clip:text drops out on paper — force solid ink or it prints
+   invisible. */
+  @media print {
+    .glow-sweep {
+      background: none !important;
+      -webkit-text-fill-color: #1f2937 !important;
+      color: #1f2937 !important;
+      filter: none !important;
+      animation: none !important;
+    }
+  }
+}

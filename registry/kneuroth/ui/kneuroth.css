@@ -1,0 +1,107 @@
+@charset "UTF-8";
+
+/* Tailwind's own layer order, declared here too so it holds whichever
+   stylesheet loads first. Component rules live in `components`: above
+   preflight, below utilities — so a className on any component wins. */
+@layer theme, base, components, utilities;
+
+/* ─────────────────────────────────────────────────────────────────────────
+   kneuroth-ui — the shared base.
+
+   Tokens, the animated custom properties and the keyframes every other
+   component leans on. Every component file imports this one, so you never
+   import it yourself; it is plain CSS (no Tailwind needed) and safe to load
+   more than once — bundlers dedupe it.
+
+   The one trap to know about: the conic gradients and colour-mixes that paint
+   the glow are written INLINE wherever they are used, naming --glow-angle /
+   --glow-a / --glow-b / --breathe directly. Routing them through an
+   intermediate custom property stops the browser repainting as they animate,
+   and the ring sits frozen.
+   ───────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Light washed-out blue: the far end of the links' resting white→blue
+     gradient, and the solid colour every icon is painted. */
+  --sweep-base: rgb(165 197 222 / 1);
+
+  /* The Rubik's cube: the glow always shows white plus two of these. */
+  --cube-orange: #ff5800;
+  --cube-green: #009b48;
+  --cube-red: #c41e3a;
+  --cube-blue: #0051ba;
+
+  /* The one palette accent: page titles, quiet chrome. */
+  --frenchgrey: #bbb9be;
+}
+
+/* Angle + the two cube colours inherit, so a single animation on a host drives
+   the glow layers (::before / ::after) beneath it. */
+@property --glow-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: true;
+}
+
+@property --glow-a {
+  syntax: '<color>';
+  initial-value: #ff5800;
+  inherits: true;
+}
+
+@property --glow-b {
+  syntax: '<color>';
+  initial-value: #0051ba;
+  inherits: true;
+}
+
+/* Where blue takes over in the resting white→blue gradients; animated by
+   `breathe`. Registered so the percentage interpolates. */
+@property --breathe {
+  syntax: '<percentage>';
+  initial-value: 80%;
+  inherits: true;
+}
+
+@keyframes glowSpin {
+  to {
+    --glow-angle: 360deg;
+  }
+}
+
+/* Rubik's top-face corners — white is always the third colour, so each stop is
+   a 3-colour triad; the two cube colours swap one at a time:
+   orange+blue → orange+green → red+green → red+blue → orange+blue. */
+@keyframes glowCube {
+  0% {
+    --glow-a: #ff5800;
+    --glow-b: #0051ba;
+  }
+  25% {
+    --glow-a: #ff5800;
+    --glow-b: #009b48;
+  }
+  50% {
+    --glow-a: #c41e3a;
+    --glow-b: #009b48;
+  }
+  75% {
+    --glow-a: #c41e3a;
+    --glow-b: #0051ba;
+  }
+  100% {
+    --glow-a: #ff5800;
+    --glow-b: #0051ba;
+  }
+}
+
+/* Lighter (white-dominant) ↔ bluer, and back. */
+@keyframes breathe {
+  0%,
+  100% {
+    --breathe: 100%;
+  }
+  50% {
+    --breathe: 25%;
+  }
+}

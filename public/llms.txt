@@ -1,0 +1,100 @@
+# kneuroth-ui
+
+> The "embossed glow" components behind kneuroth.github.io, distributed as a
+> shadcn registry. React 19 + plain CSS; no runtime dependencies. The shadcn CLI
+> copies source into the consuming project's components/ui/ directory.
+
+Docs page: https://kneuroth.github.io/kneuroth-ui/
+Registry index: https://kneuroth.github.io/kneuroth-ui/r/registry.json
+Item JSON: https://kneuroth.github.io/kneuroth-ui/r/{name}.json
+
+## Setup
+
+1. The project needs a shadcn components.json. If absent: `npx shadcn@latest init`.
+2. Register the namespace once per project (writes `registries` into components.json):
+   `npx shadcn@latest registry add @kneuroth=https://kneuroth.github.io/kneuroth-ui/r/{name}.json`
+3. Add items: `npx shadcn@latest add @kneuroth/<item>` — or `@kneuroth/all`.
+4. Update later: re-run the add with `--overwrite` (preview with `--diff`).
+
+All files are `registry:ui` and land flat in the `ui` alias directory, importing
+each other relatively. Each component imports its own CSS. Do not import
+component CSS by hand, do not move files out of that directory individually.
+
+## Items
+
+- base — kneuroth.css (tokens, @property glow/breathe vars, keyframes glowSpin/glowCube/breathe) + kn-utils.ts (cx, mergeRefs, useGlowDelay). Dependency of everything.
+- typography — kneuroth-type.css: monospace stack, `body { text-transform: lowercase }`, `.keep-case` escape. NOT imported by components; import once in the app entry / root layout.
+- glow-sweep — SweepLink, useGlowSweep(hostRef, targetRef?), the .glow-sweep / .glow-sweep-pending classes.
+- glow-button — GlowButton + glow-link.css (.glow-link and variants).
+- glass — glass.css: .glass-edge, .glass-dark, and GlassPanel's styles.
+- glass-panel — GlassPanel.
+- glass-button — GlassButton.
+- search-field — SearchField.
+- reveal — Reveal, useReveal(ref).
+- all — every item above.
+
+## Components
+
+### GlowButton — `@/components/ui/glow-button`
+A control that reads as a word: embossed letters, a revolving cube-colour ring behind.
+Props: variant 'warm' | 'dark' | 'azure' | 'icon' (default warm); icon?: ReactNode;
+sweep?: boolean; pending?: boolean; href?: string (renders <a>); size 'sm' | 'md' | 'lg';
+rounded?: boolean; plus native button/anchor props.
+- Variant by SURFACE: warm on dark/photographic ground, dark on very dark ground,
+  azure on frosted glass. Never mix warm and azure on one surface.
+- variant="icon" for EVERY icon-only button on any surface; aria-label required.
+- sweep: text link-buttons get the letter sweep instead of the ring.
+```tsx
+<GlowButton onClick={save}>save</GlowButton>
+<GlowButton variant="icon" aria-label="download" icon={<DownloadIcon />} />
+<GlowButton sweep href="/resume.pdf">resume</GlowButton>
+```
+
+### GlassButton — `@/components/ui/glass-button`
+A control that reads as an object: a pressable slab of glass with the cube triad on its rim.
+Props: tone 'light' | 'dark' (light on a page, dark on a raw photograph); href?: string
+(renders <a>); children: label and/or icon (icon-only needs aria-label).
+CSS knobs on your own class: --glass-radius (use instead of border-radius), --glass-rim, --glass-strip.
+```tsx
+<GlassButton tone="dark" href="/portfolio">portfolio</GlassButton>
+```
+
+### GlassPanel — `@/components/ui/glass-panel`
+Every frosted surface: bloom, breathing white→blue stroke, clear strip, frosted interior.
+Props: variant 'floating' | 'header' | 'footer'; edge 'none' | 'left' | 'right' (floating
+only — joins the panel to that screen edge; the caller positions it there); as?: ElementType.
+Set padding/width with classes. Glass only reads over an image or busy background.
+```tsx
+<GlassPanel className="max-w-prose p-6">…</GlassPanel>
+<GlassPanel variant="header" className="mx-4 px-5 py-3">…</GlassPanel>
+```
+Without the component: `className="glass-edge glass-dark"` (dark, inward-drawn fill;
+keep padding larger than --glass-strip).
+
+### SearchField — `@/components/ui/search-field`
+Glass you type on. No cube colours; focus holds the stroke blue; Escape clears.
+Props: value / onValueChange (controlled) or defaultValue (uncontrolled); placeholder;
+aria-label (default 'search'); className goes on the outer pane; other props to the <input>.
+CSS knobs: --search-strip, --search-radius.
+
+### SweepLink — `@/components/ui/sweep-link`
+The canonical text link. Props: pending?: boolean; anchor props. Text only — icons go
+beside it, never inside (the text clip swallows them). For a router <Link>:
+`className="glow-sweep"` + `useGlowSweep(ref)`.
+
+### Reveal — `@/components/ui/reveal`
+Flies ONE child in from the side the first time it scrolls into view; reveals once.
+Props: from 'left' | 'right'. An ancestor must set `overflow-x: clip`.
+Hook: `useReveal(ref): boolean`.
+
+## Rules
+
+- Every clickable element is a GlowButton, GlassButton or SweepLink. No bare
+  <button>, no one-off hover styles, no ad-hoc link colours.
+- Every icon is --sweep-base (pale blue). Icons never take a colour of their own.
+- Every animation has a prefers-reduced-motion off-switch and a print fallback.
+- Conic gradients / color-mix that paint the glow must name --glow-angle, --glow-a,
+  --glow-b, --breathe directly; routing them through another custom property
+  freezes the animation.
+- Components carry "use client"; they are safe in Next.js App Router. Random glow
+  phases are set after mount, so there is no hydration mismatch.
